@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghép LBG THCS & THPT | Trường PTDTNT THCS-THPT Mai Sơn</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script>if(!window.ExcelJS){document.write('<script src="https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js"><\/script>');}</script>
+<style>
+:root{
+  font-family:Segoe UI,Arial,sans-serif;
+  color:#123524;
+  background:#eaf7ef;
+  --green-950:#073b26;
+  --green-900:#0b4d32;
+  --green-800:#0f6841;
+  --green-700:#138a52;
+  --green-600:#19a862;
+  --green-500:#22c55e;
+  --green-300:#86efac;
+  --green-200:#bbf7d0;
+  --green-100:#dcfce7;
+  --green-50:#f0fdf4;
+  --ink:#123524;
+  --muted:#527363;
+  --shadow-dark:rgba(7,59,38,.24);
+  --shadow-light:rgba(255,255,255,.95);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  padding:34px 22px;
+  background:
+    radial-gradient(circle at 12% 12%,rgba(134,239,172,.55),transparent 24%),
+    radial-gradient(circle at 88% 18%,rgba(34,197,94,.18),transparent 27%),
+    linear-gradient(145deg,#dff7e7 0%,#f7fff9 48%,#d8f4e1 100%);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(15,104,65,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,104,65,.035) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 78%);
+}
+.card{
+  position:relative;
+  width:min(1180px,100%);
+  background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(236,253,245,.98));
+  border:1px solid rgba(34,197,94,.25);
+  border-radius:28px;
+  padding:34px;
+  box-shadow:
+    0 28px 58px rgba(7,59,38,.19),
+    0 10px 18px rgba(7,59,38,.12),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -2px 0 rgba(15,104,65,.06);
+  transform:translateZ(0);
+}
+.card::before{
+  content:"";
+  position:absolute;
+  left:28px;right:28px;top:0;
+  height:7px;
+  border-radius:0 0 12px 12px;
+  background:linear-gradient(90deg,var(--green-800),var(--green-500),var(--green-800));
+  box-shadow:0 5px 13px rgba(19,138,82,.28);
+}
+h1{
+  margin:3px 0 9px;
+  font-size:30px;
+  line-height:1.2;
+  color:var(--green-950);
+  text-shadow:0 1px 0 #fff;
+  letter-spacing:.2px;
+}
+.sub{margin:0 0 24px;color:var(--muted);line-height:1.6}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:linear-gradient(145deg,#ecfdf5,#c9f7da);
+  color:var(--green-800);
+  border:1px solid #a7efc0;
+  font-weight:800;
+  font-size:12px;
+  margin-bottom:11px;
+  box-shadow:4px 4px 9px rgba(7,59,38,.12),-3px -3px 7px rgba(255,255,255,.9),inset 0 1px 0 #fff;
+}
+.badge::before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--green-700);color:#fff;font-size:11px;box-shadow:0 2px 5px rgba(7,59,38,.25)}
+.week-row{
+  margin:0 0 20px;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  flex-wrap:wrap;
+  padding:14px 16px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#effdf4,#dff7e7);
+  border:1px solid rgba(34,197,94,.22);
+  box-shadow:inset 3px 3px 8px rgba(7,59,38,.07),inset -3px -3px 8px rgba(255,255,255,.88);
+}
+.week-row label{font-weight:800;color:var(--green-900)}
+select{
+  min-width:160px;
+  border:1px solid #8ddeaa;
+  border-radius:12px;
+  padding:11px 40px 11px 14px;
+  background:linear-gradient(145deg,#fff,#e9faef);
+  color:var(--green-950);
+  font-size:15px;
+  font-weight:750;
+  outline:none;
+  box-shadow:4px 4px 9px rgba(7,59,38,.12),-4px -4px 9px rgba(255,255,255,.9),inset 0 1px 0 #fff;
+  cursor:pointer;
+  transition:.2s ease;
+}
+select:hover{transform:translateY(-1px);border-color:var(--green-600)}
+select:focus{border-color:var(--green-600);box-shadow:0 0 0 4px rgba(34,197,94,.14),4px 4px 9px rgba(7,59,38,.11)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.pick{
+  display:block;
+  position:relative;
+  border:1px solid rgba(34,197,94,.28);
+  border-radius:18px;
+  padding:20px;
+  background:linear-gradient(145deg,#f9fffb,#e5f8eb);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+  box-shadow:8px 8px 18px rgba(7,59,38,.13),-8px -8px 18px rgba(255,255,255,.92),inset 0 1px 0 #fff;
+  overflow:hidden;
+}
+.pick::after{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;width:6px;
+  background:linear-gradient(var(--green-500),var(--green-800));
+  box-shadow:2px 0 7px rgba(19,138,82,.18);
+}
+.pick:hover{
+  transform:translateY(-3px);
+  border-color:#79d99c;
+  box-shadow:12px 14px 22px rgba(7,59,38,.17),-7px -7px 18px rgba(255,255,255,.96),inset 0 1px 0 #fff;
+}
+.pick b{display:block;margin-bottom:10px;color:var(--green-900);font-size:16px}
+.pick small{display:block;color:#5a7868;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+input[type=file]{width:100%;color:var(--green-950)}
+input[type=file]::file-selector-button{
+  border:0;
+  border-radius:10px;
+  padding:9px 13px;
+  margin-right:10px;
+  background:linear-gradient(180deg,#27c86a,#159452);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 5px 0 #0c6d3c,0 8px 14px rgba(7,59,38,.2),inset 0 1px 0 rgba(255,255,255,.3);
+}
+input[type=file]::file-selector-button:active{transform:translateY(3px);box-shadow:0 2px 0 #0c6d3c,0 4px 8px rgba(7,59,38,.15)}
+.actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:25px}
+button{
+  border:0;
+  border-radius:13px;
+  padding:13px 22px;
+  font-weight:800;
+  font-size:16px;
+  cursor:pointer;
+  color:white;
+  background:linear-gradient(180deg,#2bd36f 0%,#159452 100%);
+  box-shadow:0 6px 0 #0b6b3b,0 12px 20px rgba(7,59,38,.22),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+button:hover:not(:disabled){transform:translateY(-2px);filter:saturate(1.08);box-shadow:0 8px 0 #0b6b3b,0 15px 24px rgba(7,59,38,.25),inset 0 1px 0 rgba(255,255,255,.4)}
+button:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #0b6b3b,0 6px 10px rgba(7,59,38,.18),inset 0 1px 0 rgba(255,255,255,.25)}
+button.secondary{background:linear-gradient(180deg,#18b77a,#0d7f55);box-shadow:0 6px 0 #075b3d,0 12px 20px rgba(7,59,38,.2),inset 0 1px 0 rgba(255,255,255,.35)}
+button:disabled{opacity:.48;cursor:not-allowed;transform:none;box-shadow:0 3px 0 #789989,0 6px 12px rgba(7,59,38,.09)}
+.status{min-height:24px;color:#426756;font-weight:650}.ok{color:#08733f}.err{color:#b42318;white-space:pre-wrap}
+.info{
+  margin-top:24px;
+  padding:15px 17px;
+  border:1px solid rgba(34,197,94,.23);
+  border-radius:15px;
+  background:linear-gradient(145deg,#f5fff8,#e8f9ed);
+  color:#466857;
+  line-height:1.6;
+  font-size:14px;
+  box-shadow:inset 3px 3px 8px rgba(7,59,38,.055),inset -3px -3px 8px rgba(255,255,255,.8);
+}
+.info b{color:var(--green-900)}
+.warn{display:none;margin-top:15px;padding:12px 14px;border-radius:12px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;box-shadow:0 5px 12px rgba(154,52,18,.08);font-size:14px}
+.preview{
+  display:none;
+  margin-top:30px;
+  padding-top:26px;
+  border-top:1px solid rgba(34,197,94,.25);
+}
+.preview.show{display:block;animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.preview-head h2{margin:0;font-size:21px;color:var(--green-950);text-shadow:0 1px 0 #fff}
+.preview-meta{color:#4f7862;font-size:14px;font-weight:700;margin-top:3px}
+.preview-wrap{
+  overflow:auto;
+  border:1px solid rgba(34,197,94,.32);
+  border-radius:16px;
+  background:linear-gradient(145deg,#ffffff,#effbf3);
+  padding:16px;
+  box-shadow:9px 10px 24px rgba(7,59,38,.13),-6px -6px 16px rgba(255,255,255,.96),inset 0 1px 0 #fff;
+}
+.schedule-paper{min-width:900px;max-width:1080px;margin:0 auto;font-family:'Times New Roman',serif;color:#000;background:#fff;padding:8px;box-shadow:0 7px 18px rgba(7,59,38,.1)}
+.schedule-title{text-align:center;font-weight:700;font-size:14pt;color:#ff0000;line-height:1.2;margin-bottom:2px}
+.schedule-teacher{text-align:center;font-size:14px;margin-bottom:4px}
+.schedule-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
+.schedule-table col.c1{width:12%}.schedule-table col.c2{width:6%}.schedule-table col.c3{width:6%}.schedule-table col.c4{width:13%}.schedule-table col.c5{width:8%}.schedule-table col.c6{width:7%}.schedule-table col.c7{width:27%}.schedule-table col.c8{width:21%}
+.schedule-table th,.schedule-table td{border:1px solid #000;padding:3px 4px;vertical-align:middle;white-space:normal;overflow-wrap:anywhere}
+.schedule-table th{text-align:center;font-weight:700;font-size:13px;line-height:1.15}
+.schedule-table td.center{text-align:center}.schedule-table td.left{text-align:left}
+.schedule-table td.day{font-size:18px;font-weight:700;font-style:italic;text-align:center;line-height:1.15}
+.schedule-table td.day small{display:block;font-size:13px;margin-top:4px}
+.schedule-table td.session{text-align:center}
+.schedule-table tr.lesson:not(.session-end) td.lesson-cell{border-bottom-style:dashed}
+.schedule-summary{font-size:13px;font-style:italic;font-weight:700;margin-top:10px;line-height:1.8}
+.preview-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media(max-width:700px){
+  body{padding:14px 9px}.card{padding:24px 16px;border-radius:20px}h1{font-size:24px}.grid{grid-template-columns:1fr}.preview-wrap{padding:8px}.actions button{width:100%}.status{width:100%}.week-row{align-items:stretch}.week-row select{width:100%}
+}
+
+/* ===== GIAO DIEN DONG NHAT VOI TRANG CHUAN HOA ===== */
+html{scroll-behavior:smooth}
+body{display:block;padding:0;margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#163124;background:radial-gradient(circle at 6% 0%,rgba(39,188,107,.16),transparent 28%),radial-gradient(circle at 94% 16%,rgba(20,168,93,.10),transparent 24%),linear-gradient(180deg,#eef8f2 0%,#f8fbf9 43%,#f2f7f4 100%)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;background-image:linear-gradient(rgba(7,86,53,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(7,86,53,.025) 1px,transparent 1px);background-size:28px 28px;mask-image:none}
+.shell{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 44px;position:relative}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px;padding:0 3px;color:#355345}.school{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:850;letter-spacing:.25px;text-transform:uppercase}.school-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#0a8f50,#075635);box-shadow:0 7px 16px rgba(7,86,53,.22),inset 0 1px 0 rgba(255,255,255,.3);display:grid;place-items:center;color:#fff}
+.app-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.app-nav a{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;text-decoration:none;font-size:12px;font-weight:800;color:#355345;background:rgba(255,255,255,.82);border:1px solid rgba(8,116,67,.13);box-shadow:0 4px 13px rgba(6,67,39,.05);transition:.18s ease}.app-nav a:hover{transform:translateY(-1px);background:#fff;color:#087443}.app-nav a.active{background:linear-gradient(180deg,#e8f8ee,#d8f3e2);color:#087443;border-color:#bfe2cc}.app-nav svg{width:15px;height:15px}
+.hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:30px 34px;margin-bottom:22px;border-radius:28px;background:linear-gradient(128deg,#063d27 0%,#087443 58%,#13a55e 100%);box-shadow:0 24px 50px rgba(5,83,48,.23),inset 0 1px 0 rgba(255,255,255,.22);color:#fff}.hero:before{content:"";position:absolute;width:300px;height:300px;right:-86px;top:-128px;border-radius:50%;background:rgba(255,255,255,.08)}.brand{position:relative;z-index:1;display:flex;gap:18px;align-items:center}.logo{width:68px;height:68px;border-radius:21px;background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.09));border:1px solid rgba(255,255,255,.24);display:grid;place-items:center;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 15px 28px rgba(3,55,31,.28)}.hero .eyebrow{margin:0 0 6px;font-size:12px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase;color:#bff4d5}.hero h1{margin:0 0 8px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.12);font-size:clamp(26px,3.6vw,38px);letter-spacing:-.6px}.hero p{margin:0;color:rgba(255,255,255,.82);line-height:1.55;max-width:760px}
+.card{width:100%;position:relative;background:rgba(255,255,255,.94);border:1px solid rgba(217,231,222,.95);border-radius:24px;padding:23px;box-shadow:0 20px 55px rgba(4,67,37,.12);transform:none}.card::before{left:22px;right:22px;height:3px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,#27bc6b,#087443);box-shadow:none}.card>h1,.card>.sub,.card>.badge{display:none}.week-row{margin:0 0 18px;border-radius:16px;background:linear-gradient(180deg,#fbfefc,#f3faf6);border:1px solid #d8e8de;box-shadow:inset 0 1px 0 #fff}.pick{border:1px solid #dce8e0;border-radius:18px;background:linear-gradient(180deg,#fff,#f8fbf9);box-shadow:0 10px 30px rgba(6,67,39,.08);padding:20px}.pick::after{width:4px;background:linear-gradient(#27bc6b,#087443);box-shadow:none}.pick:hover{box-shadow:0 14px 28px rgba(8,116,67,.10);transform:translateY(-2px)}
+.actions{margin-top:20px}.actions button{border-radius:14px;font-size:14px;min-height:47px;padding:13px 19px;background:linear-gradient(180deg,#14a85d,#087443);box-shadow:0 6px 0 #075f39,0 11px 20px rgba(8,116,67,.22)}.actions button.secondary{background:linear-gradient(180deg,#16a878,#0d7f55);box-shadow:0 6px 0 #075b3d,0 11px 20px rgba(8,116,67,.20)}
+.info{border:1px solid #edf2ef;background:#fafcfb;box-shadow:none}.preview{border-top:1px solid #edf2ef}.preview-wrap{border:1px solid #dce8e0;border-radius:17px;background:#fff;box-shadow:0 5px 15px rgba(6,67,39,.035)}
+.footer{margin-top:20px;padding:14px 10px;text-align:center;color:#7a8d82;font-size:11px}.footer strong{color:#4d6859}
+@media(max-width:680px){.shell{width:min(100% - 20px,1180px);padding-top:12px}.topbar{align-items:flex-start;flex-direction:column}.school{font-size:11px}.app-nav{width:100%;justify-content:flex-start}.app-nav a{padding:7px 10px;font-size:11px}.hero{padding:24px 19px;border-radius:22px}.logo{width:57px;height:57px;border-radius:17px}.brand{align-items:flex-start;gap:13px}.card{padding:18px;border-radius:20px}}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="school">
+      <span class="school-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 8.5 12 4l8.5 4.5L12 13 3.5 8.5Z"/><path d="M6.5 10.2V15c0 1.7 2.5 3 5.5 3s5.5-1.3 5.5-3v-4.8"/><path d="M20.5 8.5V15"/></svg></span>
+      <span>Trường PTDTNT THCS-THPT Mai Sơn</span>
+    </div>
+    <nav class="app-nav" aria-label="Điều hướng công cụ">
+      <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg>Trang chính</a>
+      <a href="Chuan_hoa.html">Chuẩn hoá LBG</a>
+      <a class="active" href="Ghep_LBG.html">Ghép LBG THCS&THPT</a>
+    </nav>
+  </div>
+  <header class="hero">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h6v14H4zM14 5h6v14h-6z"/><path d="M10 9h4M10 15h4"/><path d="m16.2 11.8 1.2 1.2 2.2-2.6"/></svg></div>
+      <div><p class="eyebrow">Bộ công cụ Lịch báo giảng</p><h1>Ghép LBG THCS & THPT</h1><p>Ghép hai file lịch báo giảng THCS và THPT, kiểm tra xung đột, xem trước kết quả và xuất Excel ngay trên trình duyệt.</p></div>
+    </div>
+  </header>
+<main class="card">
+  <div class="badge">CHẠY TRỰC TIẾP TRÊN TRÌNH DUYỆT</div>
+  <h1>TỔNG HỢP LỊCH BÁO GIẢNG THCS & THPT</h1>
+  <p class="sub">Chọn tuần và 2 file lịch báo giảng, sau đó bấm <b>1. Tổng hợp lịch</b> để xem kết quả ngay trên trang. Khi dữ liệu đã đúng, bấm <b>2. Tải Excel</b> để xuất file theo đúng định dạng mẫu.</p>
+  <div class="week-row">
+    <label for="weekSelect">Tuần báo giảng:</label>
+    <select id="weekSelect" aria-label="Chọn tuần báo giảng"></select>
+  </div>
+  <div class="grid">
+    <label class="pick"><b>1. File THCS (.xlsx)</b><input id="thcs" type="file" accept=".xlsx"><small id="thcsName">Chưa chọn file</small></label>
+    <label class="pick"><b>2. File THPT (.xlsx)</b><input id="thpt" type="file" accept=".xlsx"><small id="thptName">Chưa chọn file</small></label>
+  </div>
+  <div class="actions"><button id="mergeBtn" type="button">1. Tổng hợp lịch</button><button id="downloadBtn" class="secondary" type="button" disabled>2. Tải Excel</button><span id="status" class="status"></span></div>
+  <div id="libWarn" class="warn">Không tải được thư viện xử lý Excel. Hãy kiểm tra kết nối Internet rồi mở lại trang.</div>
+  <div class="info"><b>Quy tắc:</b> chỉ giữ buổi có ít nhất một tiết dạy; mỗi buổi vẫn hiển thị đủ 5 tiết TKB. Nếu THCS và THPT có dữ liệu khác nhau ở đúng cùng một tiết, trang sẽ báo xung đột để kiểm tra.</div>
+
+  <section id="preview" class="preview" aria-live="polite">
+    <div class="preview-head">
+      <div>
+        <h2>Lịch báo giảng tuần đã tổng hợp</h2>
+        <div id="previewMeta" class="preview-meta"></div>
+      </div>
+    </div>
+    <div class="preview-wrap">
+      <div id="schedulePreview" class="schedule-paper"></div>
+    </div>
+  </section>
+</main>
+<div class="footer"><strong>Trường PTDTNT THCS-THPT Mai Sơn</strong> • Bộ công cụ Lịch báo giảng • Hoạt động trên các trình duyệt hiện đại</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const thcs=$('thcs'), thpt=$('thpt'), btn=$('mergeBtn'), downloadBtn=$('downloadBtn'), statusEl=$('status'), weekSelect=$('weekSelect'), preview=$('preview'), previewMeta=$('previewMeta'), schedulePreview=$('schedulePreview');
+let lastExport=null;
+for(let i=1;i<=40;i++){const opt=document.createElement('option');opt.value=String(i).padStart(2,'0');opt.textContent=`Tuần ${opt.value}`;weekSelect.appendChild(opt);}
+function resetPreview(){lastExport=null;downloadBtn.disabled=true;preview.classList.remove('show');schedulePreview.innerHTML='';previewMeta.textContent='';setStatus('');}
+thcs.addEventListener('change',()=>{ $('thcsName').textContent=thcs.files[0]?.name||'Chưa chọn file'; resetPreview(); });
+thpt.addEventListener('change',()=>{ $('thptName').textContent=thpt.files[0]?.name||'Chưa chọn file'; resetPreview(); });
+window.addEventListener('load',()=>{if(typeof ExcelJS==='undefined')$('libWarn').style.display='block';});
+function setStatus(msg,cls=''){statusEl.className='status '+cls;statusEl.textContent=msg;}
+function norm(v){if(v==null)return ''; if(v instanceof Date)return v.toLocaleDateString('vi-VN'); if(typeof v==='object'&&v.text!=null)return String(v.text).trim(); return String(v).trim();}
+function val(ws,r,c){return ws.getRow(r).getCell(c).value;}
+function lessonHasData(a){return a.slice(1).some(v=>norm(v)!=='');}
+async function readFile(file){const wb=new ExcelJS.Workbook();await wb.xlsx.load(await file.arrayBuffer());return wb;}
+function readBlocks(wb){
+ const ws=wb.worksheets[0]; if(!ws)throw new Error('Không tìm thấy trang tính.');
+ if(ws.rowCount<70)throw new Error('File không đúng cấu trúc lịch báo giảng mẫu.');
+ const title=norm(val(ws,2,1))||'LỊCH BÁO GIẢNG', header=norm(val(ws,3,1));
+ const blocks=[]; let dayName='',date='';
+ for(let start=5;start<=70;start+=5){
+   const a=norm(val(ws,start,1)), session=norm(val(ws,start,2));
+   if(start%10===5)dayName=a; else date=a;
+   const lessons=[];
+   for(let r=start;r<start+5;r++) lessons.push([val(ws,r,3),val(ws,r,4),val(ws,r,5),val(ws,r,6),val(ws,r,7),val(ws,r,8)]);
+   blocks.push({day_name:dayName,date,session,lessons});
+   if(start%10===0&&blocks.length>=2)blocks[blocks.length-2].date=date;
+ }
+ return {title,header,sheetTitle:ws.name,blocks};
+}
+function mergeData(a,b){
+ const kept=[],conflicts=[];
+ for(let i=0;i<a.blocks.length;i++){
+   const ba=a.blocks[i],bb=b.blocks[i],merged=[];let has=false;
+   for(let j=0;j<5;j++){
+     const la=ba.lessons[j],lb=bb.lessons[j],ha=lessonHasData(la),hb=lessonHasData(lb);
+     if(ha&&hb){const sa=la.slice(1).map(norm).join('|'),sb=lb.slice(1).map(norm).join('|');if(sa!==sb)conflicts.push(`${ba.day_name||bb.day_name} ${ba.date||bb.date} - ${ba.session||bb.session} - tiết ${j+1}`);}
+     merged.push(hb&&!ha?lb:la); if(ha||hb)has=true;
+   }
+   if(has)kept.push({day_name:ba.day_name||bb.day_name,date:ba.date||bb.date,session:ba.session||bb.session,lessons:merged});
+ }
+ if(conflicts.length)throw new Error('Phát hiện dữ liệu xung đột cùng một tiết:\n- '+conflicts.join('\n- ')+'\n\nVui lòng kiểm tra lại 2 file nguồn.');
+ if(!kept.length)throw new Error('Không tìm thấy tiết dạy nào trong hai file.');
+ return kept;
+}
+const FONT='Times New Roman';
+const thin={style:'thin',color:{argb:'FF000000'}}, dashed={style:'dashed',color:{argb:'FF000000'}}, dbl={style:'double',color:{argb:'FF000000'}};
+function font(sz=11,bold=false,italic=false){return {name:FONT,size:sz,bold,italic,color:{argb:'FF000000'}};}
+function applyCell(cell,{f=font(),align={horizontal:'center',vertical:'middle',wrapText:true},border=null}={}){cell.font=f;cell.alignment=align;if(border)cell.border=border;}
+
+function esc(v){return norm(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function renderPreview(meta,kept,weekNo,lessonCount){
+  const rows=[];
+  let i=0;
+  while(i<kept.length){
+    const first=kept[i], key=`${first.day_name}||${first.date}`, group=[];
+    while(i<kept.length && `${kept[i].day_name}||${kept[i].date}`===key){group.push(kept[i]);i++;}
+    let firstDayRow=true;
+    for(const block of group){
+      for(let k=0;k<5;k++){
+        const les=block.lessons[k];
+        let cells='';
+        if(firstDayRow){
+          cells+=`<td class="day" rowspan="${group.length*5}">${esc(first.day_name)}<small>${esc(first.date)}</small></td>`;
+          firstDayRow=false;
+        }
+        if(k===0)cells+=`<td class="session" rowspan="5">${esc(block.session)}</td>`;
+        const endCls=k===4?' session-end':'';
+        rows.push(`<tr class="lesson${endCls}">${cells}<td class="center lesson-cell">${k+1}</td><td class="left lesson-cell">${esc(les[1])}</td><td class="center lesson-cell">${esc(les[2])}</td><td class="center lesson-cell">${esc(les[3])}</td><td class="left lesson-cell">${esc(les[4])}</td><td class="left lesson-cell">${esc(les[5])}</td></tr>`);
+      }
+    }
+  }
+  schedulePreview.innerHTML=`
+    <div class="schedule-title">KẾ HOẠCH GIẢNG DẠY TUẦN ${esc(weekNo)}</div>
+    <div class="schedule-teacher">${esc(meta.header)}</div>
+    <table class="schedule-table">
+      <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"></colgroup>
+      <thead><tr><th colspan="2">Thứ, ngày, buổi</th><th>Tiết<br>TKB</th><th>Môn<br>(hoặc PM)</th><th>Lớp</th><th>Tiết<br>PPCT</th><th>Tên bài dạy</th><th>Chuẩn bị, điều chỉnh</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+    <div class="schedule-summary">
+      <div>1. Tổng số tiết thực dạy trong tuần: ${lessonCount}</div>
+      <div>2. Các nhiệm vụ khác: (Nội dung, cách thức, thời gian, điều kiện thực hiện).</div>
+      <div>3. Nội dung các cuộc họp/dự giờ.</div>
+      <div>4. Đánh giá kết quả thực hiện (tồn lại, nguyên nhân, giải pháp, đề xuất, kiến nghị).</div>
+    </div>`;
+  previewMeta.textContent=`Tuần ${weekNo} • ${kept.length} buổi • ${lessonCount} tiết thực dạy`;
+  preview.classList.add('show');
+  preview.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function triggerDownload(buffer,weekNo){
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=`KeHoachGiangDay_Tuan_${weekNo}.xlsx`;
+  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+downloadBtn.addEventListener('click',()=>{
+  if(!lastExport){setStatus('Hãy tổng hợp lịch trước khi tải Excel.','err');return;}
+  triggerDownload(lastExport.buffer,lastExport.weekNo);
+  setStatus(`Đã tải file Excel Lịch báo giảng Tuần ${lastExport.weekNo}.`,'ok');
+});
+weekSelect.addEventListener('change',async()=>{
+  if(lastExport){
+    const weekNo=weekSelect.value;
+    const rebuilt=buildWorkbook(lastExport.meta,lastExport.kept,weekNo);
+    const buffer=await rebuilt.wb.xlsx.writeBuffer();
+    lastExport={...lastExport,buffer,weekNo,lessonCount:rebuilt.lessonCount};
+    downloadBtn.disabled=false;
+    renderPreview(lastExport.meta,lastExport.kept,weekNo,rebuilt.lessonCount);
+  }
+});
+
+function autoColumnWidths(kept){
+  // Tính độ rộng theo nội dung thực tế để chữ không bị che/cắt trong Excel.
+  // Cột nội dung dài vẫn có giới hạn hợp lý và tiếp tục được xuống dòng.
+  const samples=[
+    ['Thứ, ngày, buổi'],['Buổi'],['Tiết','TKB'],['Môn','(hoặc PM)'],
+    ['Lớp'],['Tiết','PPCT'],['Tên bài dạy'],['Chuẩn bị, điều chỉnh']
+  ];
+  for(const block of kept){
+    samples[0].push(block.day_name||'',block.date||'');
+    samples[1].push(block.session||'');
+    block.lessons.forEach((les,k)=>{
+      samples[2].push(String(k+1));
+      samples[3].push(norm(les[1]));
+      samples[4].push(norm(les[2]));
+      samples[5].push(norm(les[3]));
+      samples[6].push(norm(les[4]));
+      samples[7].push(norm(les[5]));
+    });
+  }
+  const minW=[13,7,7,16,8,9,28,22];
+  const maxW=[18,10,10,26,13,13,48,38];
+  return samples.map((items,idx)=>{
+    let longest=0;
+    for(const item of items){
+      const text=String(item??'');
+      for(const line of text.split(/\r?\n/)){
+        longest=Math.max(longest,Array.from(line).length);
+      }
+    }
+    const estimated=Math.ceil(longest*1.08+2.5);
+    return Math.max(minW[idx],Math.min(maxW[idx],estimated));
+  });
+}
+
+function buildWorkbook(meta,kept,weekNo){
+ const wb=new ExcelJS.Workbook(); wb.creator='Tổng hợp lịch báo giảng'; wb.created=new Date();
+ const ws=wb.addWorksheet((meta.sheetTitle||'Lịch báo giảng').slice(0,31),{views:[{showGridLines:false}]});
+
+ // Tự động căn độ rộng từng cột theo dữ liệu của tuần đang xuất.
+ const widths=autoColumnWidths(kept);
+ widths.forEach((w,i)=>ws.getColumn(i+1).width=w);
+ ws.pageSetup={
+   orientation:'portrait',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,
+   margins:{left:.28,right:.28,top:.28,bottom:.28,header:0,footer:0},horizontalCentered:true
+ };
+
+ // Tiêu đề và dòng giáo viên
+ ws.mergeCells('A2:H2');
+ ws.getCell('A2').value=`KẾ HOẠCH GIẢNG DẠY TUẦN ${weekNo}`;
+ applyCell(ws.getCell('A2'),{f:{name:FONT,size:14,bold:true,color:{argb:'FFFF0000'}},align:{horizontal:'center',vertical:'middle'}});
+ ws.getRow(2).height=21;
+
+ ws.mergeCells('A3:H3');
+ ws.getCell('A3').value=meta.header;
+ applyCell(ws.getCell('A3'),{f:font(10.5),align:{horizontal:'center',vertical:'middle'},border:{bottom:thin}});
+ ws.getRow(3).height=14.25;
+
+ // Hàng tiêu đề bảng
+ ws.mergeCells('A4:B4');
+ const heads=['Thứ, ngày, buổi','Tiết\nTKB','Môn\n(hoặc PM)','Lớp','Tiết\nPPCT','Tên bài dạy','Chuẩn bị, điều chỉnh'];
+ ws.getCell('A4').value=heads[0];
+ for(let c=3;c<=8;c++)ws.getRow(4).getCell(c).value=heads[c-2];
+ ws.getRow(4).height=27;
+ applyCell(ws.getCell('A4'),{f:font(10.5,true),border:{left:dbl,right:thin,top:dbl,bottom:thin}});
+ for(let c=3;c<=8;c++){
+   const cell=ws.getRow(4).getCell(c);
+   const right=c===8?dbl:thin;
+   applyCell(cell,{f:font(10.5,true),border:{left:thin,right,top:dbl,bottom:thin}});
+ }
+
+ let out=5,lessonCount=0;
+
+ // Nhóm các buổi liên tiếp của cùng một ngày để ô Thứ/ngày gộp xuyên cả Sáng + Chiều.
+ let i=0;
+ while(i<kept.length){
+   const first=kept[i];
+   const dayKey=`${first.day_name}||${first.date}`;
+   const group=[];
+   while(i<kept.length && `${kept[i].day_name}||${kept[i].date}`===dayKey){group.push(kept[i]);i++;}
+
+   const dayStart=out, dayEnd=out+group.length*5-1;
+   ws.mergeCells(dayStart,1,dayEnd,1);
+   const dayCell=ws.getCell(dayStart,1);
+   const dayText=first.day_name||'';
+   const dateText=first.date||'';
+   dayCell.value={richText:[
+     {font:{name:FONT,size:15,bold:true,italic:true,color:{argb:'FF000000'}},text:dayText},
+     {font:{name:FONT,size:10.5,bold:true,italic:true,color:{argb:'FF000000'}},text:(dayText&&dateText?'\n':'')+dateText}
+   ]};
+   applyCell(dayCell,{f:font(11,true,true),align:{horizontal:'center',vertical:'middle',wrapText:true},border:{left:dbl,right:thin,top:thin,bottom:thin}});
+
+   let lastSessionCell=null;
+   for(const block of group){
+     const blockStart=out;
+     ws.mergeCells(blockStart,2,blockStart+4,2);
+     const sessionCell=ws.getCell(blockStart,2);
+     sessionCell.value=block.session;
+     applyCell(sessionCell,{f:font(10.5),align:{horizontal:'center',vertical:'middle',wrapText:true},border:{left:thin,right:thin,top:thin,bottom:thin}});
+     lastSessionCell=sessionCell;
+
+     for(let k=0;k<5;k++){
+       const row=ws.getRow(out+k), les=block.lessons[k];
+       row.getCell(3).value=k+1;
+       for(let c=4;c<=8;c++)row.getCell(c).value=(les[c-3]==null?'':les[c-3]);
+
+       // Tự tăng chiều cao để mọi nội dung dài đều hiển thị đầy đủ.
+       const monText=norm(les[1]);
+       const lessonText=norm(les[4]);
+       const prepText=norm(les[5]);
+       const lineCount=(text,chars)=>{
+         if(!text)return 1;
+         return Math.max(1, String(text).split('\n').reduce((sum,line)=>sum+Math.max(1,Math.ceil(line.length/chars)),0));
+       };
+       const charsForWidth=w=>Math.max(6,Math.floor(w/1.08)-2);
+       const lines=Math.max(
+         lineCount(monText,charsForWidth(widths[3])),
+         lineCount(lessonText,charsForWidth(widths[6])),
+         lineCount(prepText,charsForWidth(widths[7]))
+       );
+       row.height=Math.max(14.25, Math.min(90, 14.25*lines));
+
+       for(let c=3;c<=8;c++){
+         const cell=row.getCell(c);
+         const bottom=(k===4?thin:dashed);
+         const right=c===8?dbl:thin;
+         let al={horizontal:'center',vertical:'middle',wrapText:true};
+         if(c===4||c===7||c===8)al={horizontal:'left',vertical:'middle',wrapText:true};
+         applyCell(cell,{f:font(10.5),align:al,border:{left:thin,right,bottom}});
+       }
+       if(lessonHasData(les))lessonCount++;
+     }
+     out+=5;
+   }
+
+   // Khung đáy cuối bảng là đường đôi như ảnh mẫu.
+   if(i===kept.length){
+     dayCell.border={...dayCell.border,bottom:dbl};
+     if(lastSessionCell)lastSessionCell.border={...lastSessionCell.border,bottom:dbl};
+     for(let c=3;c<=8;c++){
+       const cell=ws.getRow(out-1).getCell(c);
+       cell.border={...cell.border,bottom:dbl};
+     }
+   }
+ }
+
+ // Phần tổng hợp cuối trang
+ out++;
+ ws.getCell(out,1).value=`1. Tổng số tiết thực dạy trong tuần: ${lessonCount}`;
+ applyCell(ws.getCell(out,1),{f:font(10.5,true,true),align:{horizontal:'left',vertical:'top'}});
+ ws.getRow(out).height=18;
+ out+=2;
+
+ const sections=[
+  '2. Các nhiệm vụ khác: (Nội dung, cách thức, thời gian, điều kiện thực hiện).',
+  '3. Nội dung các cuộc họp/dự giờ.',
+  '4. Đánh giá kết quả thực hiện (tồn lại, nguyên nhân, giải pháp, đề xuất, kiến nghị).'
+ ];
+ for(const s of sections){
+   ws.mergeCells(out,1,out,8);
+   ws.getCell(out,1).value=s;
+   applyCell(ws.getCell(out,1),{f:font(10.5,true,true),align:{horizontal:'left',vertical:'top',wrapText:true}});
+   ws.getRow(out).height=18;
+   out++;
+   for(let n=0;n<2;n++){
+     ws.mergeCells(out,2,out,8);
+     ws.getCell(out,2).value='................................................................................................................................................';
+     applyCell(ws.getCell(out,2),{f:font(10,false,true),align:{horizontal:'left',vertical:'top'}});
+     ws.getRow(out).height=14;
+     out++;
+   }
+   if(s!==sections[sections.length-1])out++;
+ }
+
+ ws.printArea=`A1:H${out-1}`;
+ return {wb,lessonCount,sessionCount:kept.length};
+}
+btn.addEventListener('click',async()=>{
+ if(typeof ExcelJS==='undefined'){setStatus('Không tải được thư viện Excel. Kiểm tra Internet rồi mở lại trang.','err');return;}
+ if(!thcs.files[0]||!thpt.files[0]){setStatus('Vui lòng chọn đủ 2 file THCS và THPT.','err');return;}
+ btn.disabled=true;setStatus('Đang tổng hợp...');
+ try{
+   const [w1,w2]=await Promise.all([readFile(thcs.files[0]),readFile(thpt.files[0])]);
+   const a=readBlocks(w1),b=readBlocks(w2),kept=mergeData(a,b),weekNo=weekSelect.value,meta=(a.header?a:b),out=buildWorkbook(meta,kept,weekNo);
+   const buffer=await out.wb.xlsx.writeBuffer();
+   lastExport={buffer,weekNo,meta,kept,lessonCount:out.lessonCount};
+   downloadBtn.disabled=false;
+   renderPreview(meta,kept,weekNo,out.lessonCount);
+   setStatus(`Đã tổng hợp: ${out.sessionCount} buổi, ${out.lessonCount} tiết thực dạy. Lịch đã được hiển thị phía dưới. Bây giờ có thể bấm “2. Tải Excel”.`,'ok');
+ }catch(e){setStatus(e?.message||String(e),'err');}finally{btn.disabled=false;}
+});
+</script>
+</body>
+</html>
