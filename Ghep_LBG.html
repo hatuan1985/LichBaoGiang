@@ -215,7 +215,7 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none;box-shadow:0 3px 0
   box-shadow:9px 10px 24px rgba(7,59,38,.13),-6px -6px 16px rgba(255,255,255,.96),inset 0 1px 0 #fff;
 }
 .schedule-paper{min-width:900px;max-width:1080px;margin:0 auto;font-family:'Times New Roman',serif;color:#000;background:#fff;padding:8px;box-shadow:0 7px 18px rgba(7,59,38,.1)}
-.schedule-title{text-align:center;font-weight:700;font-size:16px;line-height:1.2;margin-bottom:2px}
+.schedule-title{text-align:center;font-weight:700;font-size:14pt;color:#ff0000;line-height:1.2;margin-bottom:2px}
 .schedule-teacher{text-align:center;font-size:14px;margin-bottom:4px}
 .schedule-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
 .schedule-table col.c1{width:12%}.schedule-table col.c2{width:6%}.schedule-table col.c3{width:6%}.schedule-table col.c4{width:13%}.schedule-table col.c5{width:8%}.schedule-table col.c6{width:7%}.schedule-table col.c7{width:27%}.schedule-table col.c8{width:21%}
@@ -369,7 +369,7 @@ function renderPreview(meta,kept,weekNo,lessonCount){
     }
   }
   schedulePreview.innerHTML=`
-    <div class="schedule-title">LỊCH BÁO GIẢNG TUẦN ${esc(weekNo)}</div>
+    <div class="schedule-title">KẾ HOẠCH GIẢNG DẠY TUẦN ${esc(weekNo)}</div>
     <div class="schedule-teacher">${esc(meta.header)}</div>
     <table class="schedule-table">
       <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"></colgroup>
@@ -389,7 +389,7 @@ function renderPreview(meta,kept,weekNo,lessonCount){
 function triggerDownload(buffer,weekNo){
   const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  link.href=url;link.download=`Tong_hop_lich_bao_giang_THCS_THPT_Tuan_${weekNo}.xlsx`;
+  link.href=url;link.download=`KeHoachGiangDay_Tuan_${weekNo}.xlsx`;
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 downloadBtn.addEventListener('click',()=>{
@@ -408,12 +408,46 @@ weekSelect.addEventListener('change',async()=>{
   }
 });
 
+function autoColumnWidths(kept){
+  // Tính độ rộng theo nội dung thực tế để chữ không bị che/cắt trong Excel.
+  // Cột nội dung dài vẫn có giới hạn hợp lý và tiếp tục được xuống dòng.
+  const samples=[
+    ['Thứ, ngày, buổi'],['Buổi'],['Tiết','TKB'],['Môn','(hoặc PM)'],
+    ['Lớp'],['Tiết','PPCT'],['Tên bài dạy'],['Chuẩn bị, điều chỉnh']
+  ];
+  for(const block of kept){
+    samples[0].push(block.day_name||'',block.date||'');
+    samples[1].push(block.session||'');
+    block.lessons.forEach((les,k)=>{
+      samples[2].push(String(k+1));
+      samples[3].push(norm(les[1]));
+      samples[4].push(norm(les[2]));
+      samples[5].push(norm(les[3]));
+      samples[6].push(norm(les[4]));
+      samples[7].push(norm(les[5]));
+    });
+  }
+  const minW=[13,7,7,16,8,9,28,22];
+  const maxW=[18,10,10,26,13,13,48,38];
+  return samples.map((items,idx)=>{
+    let longest=0;
+    for(const item of items){
+      const text=String(item??'');
+      for(const line of text.split(/\r?\n/)){
+        longest=Math.max(longest,Array.from(line).length);
+      }
+    }
+    const estimated=Math.ceil(longest*1.08+2.5);
+    return Math.max(minW[idx],Math.min(maxW[idx],estimated));
+  });
+}
+
 function buildWorkbook(meta,kept,weekNo){
  const wb=new ExcelJS.Workbook(); wb.creator='Tổng hợp lịch báo giảng'; wb.created=new Date();
  const ws=wb.addWorksheet((meta.sheetTitle||'Lịch báo giảng').slice(0,31),{views:[{showGridLines:false}]});
 
- // Tỷ lệ cột theo ảnh mẫu: Thứ/ngày | Buổi | TKB | Môn | Lớp | PPCT | Tên bài | Chuẩn bị
- const widths=[12.2,6.4,5.6,12.8,8.2,7.2,29.0,25.0];
+ // Tự động căn độ rộng từng cột theo dữ liệu của tuần đang xuất.
+ const widths=autoColumnWidths(kept);
  widths.forEach((w,i)=>ws.getColumn(i+1).width=w);
  ws.pageSetup={
    orientation:'portrait',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,
@@ -422,9 +456,9 @@ function buildWorkbook(meta,kept,weekNo){
 
  // Tiêu đề và dòng giáo viên
  ws.mergeCells('A2:H2');
- ws.getCell('A2').value=`LỊCH BÁO GIẢNG TUẦN ${weekNo}`;
- applyCell(ws.getCell('A2'),{f:font(11,true),align:{horizontal:'center',vertical:'middle'}});
- ws.getRow(2).height=15;
+ ws.getCell('A2').value=`KẾ HOẠCH GIẢNG DẠY TUẦN ${weekNo}`;
+ applyCell(ws.getCell('A2'),{f:{name:FONT,size:14,bold:true,color:{argb:'FFFF0000'}},align:{horizontal:'center',vertical:'middle'}});
+ ws.getRow(2).height=21;
 
  ws.mergeCells('A3:H3');
  ws.getCell('A3').value=meta.header;
@@ -487,8 +521,13 @@ function buildWorkbook(meta,kept,weekNo){
          if(!text)return 1;
          return Math.max(1, String(text).split('\n').reduce((sum,line)=>sum+Math.max(1,Math.ceil(line.length/chars)),0));
        };
-       const lines=Math.max(lineCount(monText,16),lineCount(lessonText,40),lineCount(prepText,34));
-       row.height=Math.max(14.25, Math.min(72, 14.25*lines));
+       const charsForWidth=w=>Math.max(6,Math.floor(w/1.08)-2);
+       const lines=Math.max(
+         lineCount(monText,charsForWidth(widths[3])),
+         lineCount(lessonText,charsForWidth(widths[6])),
+         lineCount(prepText,charsForWidth(widths[7]))
+       );
+       row.height=Math.max(14.25, Math.min(90, 14.25*lines));
 
        for(let c=3;c<=8;c++){
          const cell=row.getCell(c);
